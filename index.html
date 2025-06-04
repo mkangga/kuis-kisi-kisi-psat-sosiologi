@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Sosiologi Kelas 10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Latar belakang abu-abu muda */
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .question-text {
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            color: #1e293b; /* Slate 800 */
+            margin-bottom: 1.5rem;
+        }
+        .option-button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid #cbd5e1; /* Slate 300 */
+            border-radius: 8px;
+            background-color: #f8fafc; /* Slate 50 */
+            color: #334155; /* Slate 700 */
+            transition: all 0.2s ease-in-out;
+        }
+        .option-button:hover:not(:disabled) {
+            background-color: #e2e8f0; /* Slate 200 */
+            border-color: #94a3b8; /* Slate 400 */
+        }
+        .option-button.correct {
+            background-color: #dcfce7; /* Green 100 */
+            border-color: #22c55e; /* Green 500 */
+            color: #166534; /* Green 800 */
+        }
+        .option-button.incorrect {
+            background-color: #fee2e2; /* Red 100 */
+            border-color: #ef4444; /* Red 500 */
+            color: #991b1b; /* Red 800 */
+        }
+        .explanation {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f1f5f9; /* Slate 100 */
+            border-radius: 8px;
+            border-left: 4px solid #64748b; /* Slate 500 */
+        }
+        .explanation h4 {
+            font-weight: 600;
+            color: #1e293b; /* Slate 800 */
+            margin-bottom: 0.5rem;
+        }
+        .explanation p {
+            color: #475569; /* Slate 600 */
+            font-size: 0.9rem;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e5e7eb; /* Gray 200 */
+            border-radius: 9999px;
+            height: 10px;
+            margin-bottom: 1rem;
+        }
+        .progress-bar {
+            background-color: #3b82f6; /* Blue 500 */
+            height: 10px;
+            border-radius: 9999px;
+            transition: width 0.3s ease-in-out;
+        }
+        .score-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #475569; /* Slate 600 */
+        }
+        .nav-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .nav-button.next {
+            background-color: #3b82f6; /* Blue 500 */
+            color: white;
+        }
+        .nav-button.next:hover {
+            background-color: #2563eb; /* Blue 600 */
+        }
+        .nav-button.restart {
+            background-color: #10b981; /* Emerald 500 */
+            color: white;
+        }
+        .nav-button.restart:hover {
+            background-color: #059669; /* Emerald 600 */
+        }
+         /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 100; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+        .modal-body {
+            font-size: 1.1rem;
+            color: #334155;
+            margin-bottom: 1.5rem;
+        }
+        .modal-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+        }
+        .modal-button:hover {
+            background-color: #2563eb;
+        }
+
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="quiz-container w-full">
+        <h1 class="text-3xl font-bold text-center mb-2 text-slate-700">Kuis Sosiologi Kelas X</h1>
+        <p class="text-center text-slate-500 mb-6">Uji pemahamanmu tentang materi Sosiologi!</p>
+
+        <div id="quiz-area">
+            <div class="flex justify-between items-center mb-4">
+                <div id="question-counter" class="text-sm font-medium text-slate-500"></div>
+                <div id="score-counter" class="score-text">Skor: 0</div>
+            </div>
+            <div class="progress-bar-container mb-6">
+                <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
+            </div>
+
+            <div id="question-text" class="question-text"></div>
+            <div id="options-container" class="mt-4"></div>
+            <div id="explanation-area" class="explanation" style="display: none;">
+                <h4>Pembahasan:</h4>
+                <p id="explanation-text"></p>
+            </div>
+            <button id="next-button" class="nav-button next mt-6 w-full" style="display: none;">Soal Berikutnya</button>
+        </div>
+
+        <div id="results-area" class="text-center" style="display: none;">
+            <h2 class="text-2xl font-bold text-slate-700 mb-4">Kuis Selesai!</h2>
+            <p id="final-score" class="text-xl text-slate-600 mb-2"></p>
+            <p id="score-message" class="text-md text-slate-500 mb-6"></p>
+            <img id="score-image" src="" alt="[Gambar terkait skor]" class="mx-auto mb-6 rounded-lg shadow-md" style="max-width: 200px; display:none;">
+            <button id="restart-button" class="nav-button restart">Ulangi Kuis</button>
+        </div>
+    </div>
+
+    <!-- Modal for confirmation -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="modal-title">Konfirmasi</h3>
+            <p id="modalBody" class="modal-body">Apakah Anda yakin dengan jawaban ini?</p>
+            <div class="flex justify-center space-x-4">
+                 <button id="modalConfirmButton" class="modal-button">Yakin</button>
+                 <button id="modalCancelButton" class="modal-button bg-red-500 hover:bg-red-600">Batal</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- Data Soal Kuis ---
+        const questions = [
+            {
+                question: "Salah satu sifat sosiologi sebagai ilmu pengetahuan adalah empiris, yang berarti...",
+                options: [
+                    "Sosiologi selalu berusaha menyusun abstraksi dari hasil observasi menjadi teori.",
+                    "Teori-teori sosiologi dibentuk berdasarkan logika dan akal sehat.",
+                    "Sosiologi didasarkan pada observasi terhadap kenyataan dan tidak bersifat spekulatif.",
+                    "Sosiologi tidak menilai baik buruknya suatu fakta, tetapi menjelaskan fakta tersebut secara analitis."
+                ],
+                correctAnswer: 2,
+                explanation: "Sifat empiris sosiologi berarti bahwa ilmu ini didasarkan pada pengamatan (observasi) terhadap kenyataan sosial dan hasilnya tidak bersifat spekulatif atau menduga-duga, melainkan berdasarkan data yang ada di lapangan."
+            },
+            {
+                question: "Munculnya tren \"Citayam Fashion Week\" di kalangan remaja perkotaan menunjukkan adanya aspek sosiologis berupa...",
+                options: [
+                    "Perubahan iklim global yang mempengaruhi gaya berpakaian.",
+                    "Interaksi sosial, pembentukan identitas kelompok, dan ekspresi budaya.",
+                    "Kebijakan pemerintah dalam mengatur ruang publik.",
+                    "Penurunan minat belajar di kalangan remaja."
+                ],
+                correctAnswer: 1,
+                explanation: "Fenomena budaya remaja seperti \"Citayam Fashion Week\" melibatkan interaksi antar individu, pembentukan identitas kolektif melalui gaya berpakaian dan perilaku, serta merupakan bentuk ekspresi budaya populer yang muncul dari dinamika sosial."
+            },
+            {
+                question: "Seorang peneliti ingin mengetahui pengaruh intensitas penggunaan media sosial terhadap tingkat partisipasi politik remaja. Rumusan masalah yang paling tepat untuk penelitian tersebut adalah...",
+                options: [
+                    "Apakah remaja suka menggunakan media sosial?",
+                    "Bagaimana media sosial mempengaruhi kehidupan remaja?",
+                    "Sejauh mana intensitas penggunaan media sosial berhubungan dengan tingkat partisipasi politik remaja?",
+                    "Mengapa partisipasi politik remaja rendah?"
+                ],
+                correctAnswer: 2,
+                explanation: "Rumusan masalah penelitian yang baik harus jelas, spesifik, dan menunjukkan hubungan antar variabel yang diteliti. Dalam kasus ini, variabelnya adalah \"intensitas penggunaan media sosial\" dan \"tingkat partisipasi politik remaja\"."
+            },
+            {
+                question: "Untuk mengatasi masalah intoleransi antar siswa yang berbeda suku di sekolah, pendekatan sosiologis yang paling relevan adalah...",
+                options: [
+                    "Memberikan hukuman berat bagi pelaku intoleransi.",
+                    "Meningkatkan pengawasan guru di setiap sudut sekolah.",
+                    "Mengadakan kegiatan bersama yang melibatkan semua siswa untuk membangun pemahaman dan empati lintas budaya.",
+                    "Memisahkan siswa berdasarkan suku untuk menghindari konflik."
+                ],
+                correctAnswer: 2,
+                explanation: "Pendekatan sosiologis untuk mengatasi intoleransi menekankan pada pemahaman akar masalah sosial dan intervensi yang membangun interaksi positif. Kegiatan bersama dapat meningkatkan pemahaman, mengurangi prasangka, dan membangun kohesi sosial antar siswa dari berbagai latar belakang."
+            },
+            {
+                question: "Tawuran pelajar seringkali dipicu oleh solidaritas kelompok yang sempit dan keinginan untuk menunjukkan eksistensi. Pola interaksi yang dominan dalam fenomena ini adalah...",
+                options: [
+                    "Akomodasi dan asimilasi.",
+                    "Kerja sama dan kompetisi.",
+                    "Konflik dan kontravensi.",
+                    "Akulturasi dan amalgamasi."
+                ],
+                correctAnswer: 2,
+                explanation: "Tawuran pelajar merupakan bentuk konflik sosial yang nyata. Sebelum terjadinya konflik terbuka (tawuran), biasanya didahului oleh kontravensi, yaitu sikap menentang secara tersembunyi, ketidakpuasan, atau keraguan terhadap kelompok lain."
+            },
+            {
+                question: "Pernyataan yang paling tepat menjelaskan pentingnya mempelajari sosiologi di era digital adalah...",
+                options: [
+                    "Sosiologi membantu memahami cara kerja algoritma media sosial.",
+                    "Sosiologi memberikan panduan teknis penggunaan gawai terbaru.",
+                    "Sosiologi membantu menganalisis dampak teknologi terhadap interaksi sosial dan perubahan masyarakat.",
+                    "Sosiologi mengajarkan cara menjadi influencer terkenal di dunia maya."
+                ],
+                correctAnswer: 2,
+                explanation: "Di era digital, sosiologi menjadi penting untuk memahami bagaimana teknologi informasi dan komunikasi mengubah pola interaksi sosial, struktur masyarakat, norma, nilai, hingga munculnya fenomena sosial baru."
+            },
+            {
+                question: "Seorang sosiolog melakukan penelitian dengan cara menyebarkan kuesioner kepada sejumlah responden untuk mengumpulkan data tentang preferensi politik. Pendekatan sosiologi yang digunakan berdasarkan cara pengumpulan datanya adalah...",
+                options: [
+                    "Pendekatan kualitatif",
+                    "Pendekatan kuantitatif",
+                    "Pendekatan historis",
+                    "Pendekatan studi kasus"
+                ],
+                correctAnswer: 1,
+                explanation: "Penggunaan kuesioner untuk mengumpulkan data dari sejumlah besar responden yang kemudian dianalisis secara statistik merupakan ciri khas pendekatan kuantitatif dalam sosiologi."
+            },
+            {
+                question: "Urbanisasi besar-besaran ke kota-kota metropolitan seringkali menimbulkan berbagai dampak sosial, salah satunya adalah...",
+                options: [
+                    "Peningkatan kualitas udara di perkotaan.",
+                    "Penurunan angka kriminalitas secara drastis.",
+                    "Munculnya permukiman kumuh dan masalah sanitasi.",
+                    "Menguatnya ikatan sosial antar warga kota."
+                ],
+                correctAnswer: 2,
+                explanation: "Salah satu dampak sosial negatif dari urbanisasi yang tidak terkendali adalah munculnya permukiman kumuh (slum area) akibat keterbatasan lahan dan daya tampung kota, yang seringkali disertai dengan masalah sanitasi dan kesehatan."
+            },
+            {
+                question: "Seorang guru BK ingin meneliti penyebab meningkatnya kasus keterlambatan siswa di sekolah. Langkah ilmiah pertama yang harus dilakukan sesuai metode penelitian sosiologi adalah...",
+                options: [
+                    "Mengumpulkan data melalui wawancara.",
+                    "Merumuskan hipotesis penelitian.",
+                    "Mengidentifikasi dan merumuskan masalah penelitian.",
+                    "Menarik kesimpulan dari data yang ada."
+                ],
+                correctAnswer: 2,
+                explanation: "Langkah awal dalam metode penelitian ilmiah, termasuk dalam sosiologi, adalah mengidentifikasi masalah yang akan diteliti secara jelas dan spesifik, kemudian merumuskannya dalam bentuk pertanyaan penelitian."
+            },
+            {
+                question: "Meskipun sering dianggap negatif, konflik sosial juga memiliki peran penting dalam dinamika masyarakat, yaitu...",
+                options: [
+                    "Selalu menciptakan disintegrasi dan perpecahan.",
+                    "Memperkuat solidaritas internal kelompok yang berkonflik dan mendorong perubahan sosial.",
+                    "Menghilangkan semua perbedaan yang ada dalam masyarakat.",
+                    "Menjamin stabilitas sosial yang permanen."
+                ],
+                correctAnswer: 1,
+                explanation: "Salah satu fungsi positif konflik (menurut beberapa teori sosiologi) adalah dapat meningkatkan solidaritas di dalam kelompok (in-group solidarity) yang sedang berkonflik dengan kelompok lain, serta dapat menjadi pendorong terjadinya perubahan sosial."
+            },
+             {
+                question: "Seorang siswa ketahuan mencontek saat ujian. Tindakan yang paling tepat dilakukan oleh pihak sekolah berdasarkan norma yang berlaku adalah...",
+                options: [
+                    "Membiarkannya karena kasihan.",
+                    "Memberikan sanksi sesuai aturan sekolah, seperti pengurangan nilai atau teguran.",
+                    "Menghukumnya secara fisik di depan siswa lain.",
+                    "Mengeluarkannya langsung dari sekolah tanpa proses."
+                ],
+                correctAnswer: 1,
+                explanation: "Pelanggaran norma di sekolah, seperti mencontek, harus ditindak dengan sanksi yang sesuai dengan aturan dan tata tertib yang berlaku. Tujuannya adalah memberikan efek jera dan pembelajaran, bukan kekerasan atau tindakan sewenang-wenang."
+            },
+            {
+                question: "Lunturnya nilai gotong royong di masyarakat perkotaan menjadi keprihatinan banyak pihak. Solusi sosiologis yang dapat dirumuskan untuk mengatasi masalah ini adalah...",
+                options: [
+                    "Mewajibkan semua warga mengikuti kegiatan kerja bakti setiap hari.",
+                    "Memberikan denda bagi warga yang tidak mau bergotong royong.",
+                    "Merevitalisasi ruang-ruang publik dan kegiatan komunitas yang mendorong interaksi dan kerjasama warga.",
+                    "Menayangkan iklan layanan masyarakat tentang pentingnya gotong royong secara masif."
+                ],
+                correctAnswer: 2,
+                explanation: "Solusi sosiologis terhadap lunturnya nilai gotong royong perlu menyentuh akar masalahnya, yaitu minimnya interaksi dan ruang bersama. Merevitalisasi ruang publik dan kegiatan komunitas dapat memfasilitasi interaksi, membangun kepercayaan, dan menghidupkan kembali semangat gotong royong."
+            },
+            {
+                question: "Sekelompok remaja melakukan aksi vandalisme dengan mencoret-coret fasilitas umum. Jenis norma yang paling jelas mereka langgar adalah...",
+                options: [
+                    "Norma kesopanan (folkways)",
+                    "Norma kebiasaan (usage)",
+                    "Norma hukum (laws)",
+                    "Norma agama (religious norms)"
+                ],
+                correctAnswer: 2,
+                explanation: "Vandalisme atau perusakan fasilitas umum merupakan tindakan yang melanggar norma hukum karena ada sanksi pidana atau denda yang diatur dalam peraturan perundang-undangan terkait ketertiban umum dan perlindungan aset publik."
+            },
+            {
+                question: "Kebiasaan membuang sampah sembarangan masih banyak ditemukan di masyarakat. Pendekatan sosiologis yang efektif untuk mengatasi masalah ini, selain penegakan aturan, adalah...",
+                options: [
+                    "Menyediakan lebih banyak petugas kebersihan di setiap sudut jalan.",
+                    "Membangun kesadaran kolektif tentang dampak buruk sampah dan pentingnya tanggung jawab bersama melalui edukasi dan kampanye partisipatif.",
+                    "Memberikan hadiah besar bagi warga yang paling banyak mengumpulkan sampah.",
+                    "Menutup semua tempat pembuangan sampah sementara agar warga bingung."
+                ],
+                correctAnswer: 1,
+                explanation: "Selain penegakan hukum, pendekatan sosiologis yang efektif adalah membangun kesadaran dan mengubah perilaku dari dalam. Edukasi tentang dampak sampah, kampanye yang melibatkan partisipasi masyarakat, dan penanaman nilai tanggung jawab lingkungan dapat mendorong perubahan perilaku yang lebih berkelanjutan."
+            },
+            {
+                question: "Perbedaan mendasar antara norma hukum dan norma sosial (seperti norma kesusilaan atau kesopanan) terletak pada...",
+                options: [
+                    "Norma hukum tidak memiliki sanksi, sedangkan norma sosial memiliki sanksi tegas.",
+                    "Norma hukum bersifat tertulis dan memiliki sanksi yang ditegakkan oleh aparat negara, sedangkan norma sosial bisa tidak tertulis dan sanksinya bersifat sosial.",
+                    "Norma sosial lebih penting daripada norma hukum dalam mengatur masyarakat.",
+                    "Norma hukum hanya berlaku bagi pejabat negara, sedangkan norma sosial berlaku untuk semua orang."
+                ],
+                correctAnswer: 1,
+                explanation: "Norma hukum umumnya bersifat tertulis (dalam undang-undang, peraturan), memiliki sanksi yang jelas dan dipaksakan oleh lembaga resmi negara (polisi, pengadilan). Norma sosial (kesusilaan, kesopanan) bisa tidak tertulis, dan sanksinya berupa celaan, pengucilan, atau rasa malu dari masyarakat."
+            },
+            {
+                question: "Seorang remaja yang tumbuh dalam keluarga harmonis dan suportif cenderung memiliki perilaku yang baik dan bertanggung jawab. Hal ini menunjukkan keberhasilan proses sosialisasi melalui agen...",
+                options: [
+                    "Media massa",
+                    "Sekolah",
+                    "Kelompok bermain",
+                    "Keluarga"
+                ],
+                correctAnswer: 3,
+                explanation: "Keluarga adalah agen sosialisasi primer dan utama. Nilai, norma, dan pola perilaku pertama kali dipelajari anak dalam lingkungan keluarga. Keluarga yang harmonis dan suportif memberikan dasar yang kuat bagi perkembangan kepribadian yang positif."
+            },
+            {
+                question: "Pentingnya nilai dan norma dalam kehidupan sosial adalah untuk...",
+                options: [
+                    "Membatasi kebebasan individu secara total.",
+                    "Menciptakan pedoman perilaku, menjaga ketertiban, dan memungkinkan interaksi sosial yang teratur.",
+                    "Menyeragamkan semua pemikiran dan tindakan anggota masyarakat.",
+                    "Menghilangkan semua bentuk konflik dalam masyarakat."
+                ],
+                correctAnswer: 1,
+                explanation: "Nilai memberikan standar tentang apa yang dianggap baik, benar, dan diinginkan. Norma adalah aturan perilaku konkret berdasarkan nilai tersebut. Keduanya berfungsi sebagai pedoman bagi individu dalam berinteraksi, menjaga keteraturan sosial, dan mencegah anomi (keadaan tanpa norma)."
+            },
+            {
+                question: "Meningkatnya individualisme dan menurunnya semangat kekeluargaan di masyarakat perkotaan modern merupakan contoh dari...",
+                options: [
+                    "Integrasi sosial yang kuat",
+                    "Pergeseran nilai sosial",
+                    "Stabilitas budaya yang tinggi",
+                    "Penguatan norma tradisional"
+                ],
+                correctAnswer: 1,
+                explanation: "Perubahan sosial seringkali diiringi dengan pergeseran nilai. Meningkatnya individualisme dan memudarnya nilai-nilai komunal seperti kekeluargaan adalah salah satu bentuk pergeseran nilai yang terjadi dalam masyarakat modern, terutama di perkotaan, akibat berbagai faktor seperti industrialisasi dan globalisasi."
+            },
+            {
+                question: "Seseorang yang berbicara dengan nada tinggi dan kata-kata kasar kepada orang yang lebih tua kemungkinan akan mendapatkan sanksi sosial berupa...",
+                options: [
+                    "Hukuman penjara",
+                    "Denda uang dalam jumlah besar",
+                    "Teguran, cibiran, atau dijauhi oleh orang lain",
+                    "Pujian atas keberaniannya"
+                ],
+                correctAnswer: 2,
+                explanation: "Pelanggaran terhadap norma kesopanan atau norma sosial yang tidak tertulis, seperti berbicara kasar kepada orang tua, biasanya akan mendapatkan sanksi sosial informal. Sanksi ini bisa berupa teguran, gunjingan, cibiran, atau bahkan pengucilan dari lingkungan sosialnya."
+            },
+            {
+                question: "Untuk membangun kesadaran kolektif tentang pentingnya toleransi di lingkungan sekolah yang beragam, cara yang paling efektif adalah...",
+                options: [
+                    "Memasang banyak poster tentang toleransi di dinding sekolah.",
+                    "Memberikan ceramah panjang tentang toleransi setiap upacara bendera.",
+                    "Mengadakan kegiatan dialog antarbudaya, simulasi, dan proyek kolaboratif yang melibatkan siswa dari berbagai latar belakang.",
+                    "Menghukum siswa yang tidak toleran dengan membersihkan toilet sekolah."
+                ],
+                correctAnswer: 2,
+                explanation: "Membangun kesadaran kolektif tentang toleransi memerlukan pendekatan partisipatif dan pengalaman langsung. Dialog, simulasi, dan proyek kolaboratif dapat meningkatkan pemahaman, empati, dan penghargaan terhadap perbedaan, sehingga toleransi tumbuh secara organik."
+            },
+            {
+                question: "Media massa, khususnya televisi dan internet, sering menampilkan gaya hidup konsumtif dan hedonis. Hal ini menunjukkan peran media sebagai agen sosialisasi yang dapat mempengaruhi...",
+                options: [
+                    "Peningkatan minat baca buku ilmiah.",
+                    "Pembentukan nilai, norma, dan perilaku individu, terutama remaja.",
+                    "Penguatan tradisi lokal secara otomatis.",
+                    "Penurunan angka kriminalitas secara signifikan."
+                ],
+                correctAnswer: 1,
+                explanation: "Media massa adalah agen sosialisasi sekunder yang kuat. Konten yang disajikan media dapat membentuk persepsi, nilai, aspirasi, dan perilaku individu, termasuk menanamkan nilai-nilai konsumerisme atau gaya hidup tertentu."
+            },
+            {
+                question: "Seorang siswa pindahan dari desa mengalami kesulitan beradaptasi dengan budaya sekolah di kota besar yang sangat berbeda. Proses sosialisasi yang dialaminya ini dapat menimbulkan...",
+                options: [
+                    "Asimilasi yang cepat dan mudah.",
+                    "Gegar budaya (culture shock) dan perasaan terasing.",
+                    "Peningkatan prestasi akademik secara instan.",
+                    "Kepemimpinan alami di antara teman-temannya."
+                ],
+                correctAnswer: 1,
+                explanation: "Ketika individu berpindah ke lingkungan budaya yang sangat berbeda, ia mungkin mengalami gegar budaya (culture shock), yaitu perasaan bingung, cemas, dan terdisorientasi akibat perbedaan nilai, norma, dan cara hidup. Ini adalah bagian dari proses adaptasi dalam sosialisasi di lingkungan baru."
+            },
+            {
+                question: "Anak-anak yang bermain peran sebagai dokter dan pasien sedang melakukan bentuk sosialisasi yang disebut...",
+                options: [
+                    "Sosialisasi represif",
+                    "Sosialisasi partisipatoris melalui tahap bermain peran (play stage)",
+                    "Sosialisasi primer yang gagal",
+                    "Pembentukan kepribadian otoriter"
+                ],
+                correctAnswer: 1,
+                explanation: "Menurut George Herbert Mead, tahap bermain peran (play stage) adalah salah satu tahap penting dalam perkembangan diri anak. Melalui bermain peran (misalnya, menjadi dokter, guru, ibu), anak belajar memahami peran orang lain dan bagaimana masyarakat mengharapkannya berperilaku."
+            },
+            {
+                question: "Ketika seorang individu mengubah perilakunya agar sesuai dengan harapan kelompok teman sebayanya agar diterima, bentuk interaksi sosial yang terjadi adalah...",
+                options: [
+                    "Konflik",
+                    "Akomodasi dalam bentuk konformitas",
+                    "Kontravensi",
+                    "Persaingan"
+                ],
+                correctAnswer: 1,
+                explanation: "Konformitas adalah bentuk interaksi sosial di mana individu menyesuaikan sikap dan perilakunya dengan norma atau tekanan kelompok agar diterima atau menghindari sanksi sosial. Ini merupakan salah satu bentuk dari proses akomodasi."
+            },
+            {
+                question: "Pentingnya sosialisasi dalam pembentukan kepribadian individu adalah karena melalui sosialisasi, individu...",
+                options: [
+                    "Mewarisi seluruh sifat genetik orang tuanya secara utuh.",
+                    "Belajar nilai, norma, pengetahuan, dan keterampilan yang dibutuhkan untuk berfungsi dalam masyarakat.",
+                    "Menjadi sepenuhnya bebas dari pengaruh lingkungan sosial.",
+                    "Mengembangkan bakat artistik secara otomatis."
+                ],
+                correctAnswer: 1,
+                explanation: "Sosialisasi adalah proses seumur hidup di mana individu mempelajari dan menginternalisasi nilai, norma, pengetahuan, keterampilan, dan peran sosial yang berlaku dalam masyarakatnya. Proses ini sangat fundamental dalam pembentukan kepribadian dan identitas diri."
+            },
+            {
+                question: "Keaktifan siswa dalam organisasi seperti OSIS atau ekstrakurikuler dapat memberikan pengaruh positif terhadap perkembangan sosial mereka, yaitu...",
+                options: [
+                    "Menjamin nilai akademik selalu tinggi.",
+                    "Mengembangkan keterampilan komunikasi, kerjasama, kepemimpinan, dan tanggung jawab.",
+                    "Membuat siswa menjadi individualistis dan tidak peduli lingkungan.",
+                    "Menghindarkan siswa dari semua pengaruh negatif teman sebaya."
+                ],
+                correctAnswer: 1,
+                explanation: "Keterlibatan dalam organisasi memberikan kesempatan bagi siswa untuk berinteraksi, belajar bekerja dalam tim, memimpin, mengambil tanggung jawab, dan mengembangkan berbagai keterampilan sosial (soft skills) yang penting untuk kehidupan bermasyarakat."
+            },
+            {
+                question: "Seorang remaja menolak nilai-nilai konservatif yang dianut orang tuanya dan lebih memilih nilai-nilai modern yang dianggapnya lebih sesuai. Proses yang terjadi pada remaja tersebut adalah...",
+                options: [
+                    "Sosialisasi primer yang sempurna",
+                    "Resosialisasi atau sosialisasi sekunder yang menantang nilai lama",
+                    "Internalisasi nilai tanpa kritik",
+                    "Kegagalan total dalam proses sosialisasi"
+                ],
+                correctAnswer: 1,
+                explanation: "Ketika individu, terutama pada masa remaja atau dewasa, mengadopsi nilai dan norma baru yang berbeda atau bahkan bertentangan dengan yang telah dipelajari sebelumnya (misalnya dari keluarga), ini bisa menjadi bagian dari proses resosialisasi atau sosialisasi sekunder yang lebih dominan."
+            },
+            {
+                question: "Pengaruh media sosial sebagai agen sosialisasi bagi remaja terutama terlihat dalam hal...",
+                options: [
+                    "Peningkatan kemampuan bertani secara tradisional.",
+                    "Pembentukan tren, bahasa gaul, standar penampilan, dan opini publik.",
+                    "Penguatan ikatan dengan generasi yang lebih tua.",
+                    "Penurunan drastis dalam penggunaan teknologi."
+                ],
+                correctAnswer: 1,
+                explanation: "Media sosial memiliki pengaruh besar dalam membentuk tren mode, bahasa, gaya hidup, standar penampilan, serta opini dan pandangan remaja. Media sosial menjadi platform penting bagi remaja untuk berinteraksi, berekspresi, dan membentuk identitas."
+            },
+            {
+                question: "Interaksi antara guru yang sedang menjelaskan materi pelajaran dan murid yang bertanya di kelas merupakan bentuk interaksi sosial...",
+                options: [
+                    "Asosiatif berupa kerja sama dan akomodasi",
+                    "Disosiatif berupa konflik terbuka",
+                    "Kontravensi tersembunyi",
+                    "Persaingan untuk mendapatkan perhatian"
+                ],
+                correctAnswer: 0,
+                explanation: "Interaksi belajar-mengajar di kelas antara guru dan murid adalah contoh interaksi sosial asosiatif. Ada unsur kerja sama (guru menyampaikan ilmu, murid belajar) dan akomodasi (murid menyesuaikan diri dengan aturan kelas, guru memfasilitasi pemahaman)."
+            },
+            {
+                question: "Dua kelompok etnis yang berbeda budaya namun hidup berdampingan secara damai dan saling menghargai di suatu wilayah menunjukkan bentuk interaksi sosial...",
+                options: [
+                    "Konflik laten",
+                    "Asimilasi total",
+                    "Akomodasi dalam bentuk toleransi atau koeksistensi damai",
+                    "Persaingan budaya yang ketat"
+                ],
+                correctAnswer: 2,
+                explanation: "Ketika dua atau lebih kelompok etnis/budaya hidup berdampingan secara damai, saling menghargai perbedaan, dan menghindari konflik terbuka, ini adalah bentuk akomodasi. Toleransi dan koeksistensi (hidup berdampingan secara damai) adalah wujudnya."
+            },
+            {
+                question: "Salah satu ciri utama dari kelompok sosial adalah...",
+                options: [
+                    "Anggotanya tidak saling mengenal satu sama lain.",
+                    "Tidak memiliki tujuan bersama yang jelas.",
+                    "Adanya kesadaran sebagai bagian dari kelompok dan terjadi interaksi antar anggota.",
+                    "Bersifat sementara dan terbentuk secara kebetulan saja."
+                ],
+                correctAnswer: 2,
+                explanation: "Ciri-ciri pokok kelompok sosial meliputi adanya kesadaran jenis (awareness of kind) di antara para anggota bahwa mereka merupakan satu kesatuan, adanya hubungan timbal balik (interaksi) antar anggota, dan adanya faktor pengikat seperti tujuan atau kepentingan bersama."
+            },
+            {
+                question: "Kelompok primer seperti keluarga memiliki peran yang sangat penting dalam pembentukan kepribadian individu karena...",
+                options: [
+                    "Memberikan kebebasan tanpa batas kepada anggotanya.",
+                    "Interaksinya bersifat formal dan berdasarkan status.",
+                    "Memberikan dasar nilai, norma, afeksi, dan rasa aman yang fundamental.",
+                    "Fokus utamanya adalah mencapai tujuan praktis tertentu."
+                ],
+                correctAnswer: 2,
+                explanation: "Kelompok primer (primary group) seperti keluarga ditandai dengan hubungan yang intim, personal, dan penuh afeksi. Di sinilah individu pertama kali belajar nilai-nilai dasar, norma, mengembangkan rasa aman, dan membentuk fondasi kepribadiannya."
+            },
+            {
+                question: "Perbedaan utama antara kelompok formal (misalnya, organisasi OSIS) dan kelompok informal (misalnya, kelompok teman bermain) terletak pada...",
+                options: [
+                    "Kelompok formal tidak memiliki aturan, sedangkan kelompok informal sangat terstruktur.",
+                    "Kelompok formal memiliki struktur organisasi, aturan, dan tujuan yang jelas serta tertulis, sedangkan kelompok informal terbentuk secara spontan berdasarkan kedekatan pribadi.",
+                    "Anggota kelompok formal lebih sedikit daripada kelompok informal.",
+                    "Kelompok informal selalu lebih berpengaruh daripada kelompok formal."
+                ],
+                correctAnswer: 1,
+                explanation: "Kelompok formal memiliki struktur yang jelas, pembagian kerja, aturan tertulis, dan tujuan spesifik (contoh: perusahaan, sekolah, OSIS). Kelompok informal terbentuk atas dasar kesamaan minat atau kedekatan personal, tanpa struktur atau aturan formal yang ketat (contoh: klik pertemanan)."
+            },
+            {
+                question: "Meskipun sering merugikan, konflik sosial terkadang dapat memiliki dampak positif, yaitu...",
+                options: [
+                    "Selalu menciptakan kehancuran total dalam masyarakat.",
+                    "Memperjelas batas-batas antar kelompok dan memperkuat solidaritas internal kelompok.",
+                    "Menghilangkan semua perbedaan pendapat secara permanen.",
+                    "Menjamin tidak akan ada perubahan sosial lagi."
+                ],
+                correctAnswer: 1,
+                explanation: "Salah satu dampak positif dari konflik (menurut Lewis Coser) adalah dapat berfungsi untuk memperjelas aspek-aspek kehidupan sosial yang belum jelas atau norma yang kabur. Konflik juga dapat meningkatkan solidaritas internal kelompok (in-group solidarity) ketika berhadapan dengan kelompok lain (out-group)."
+            },
+            {
+                question: "Dalam masyarakat multikultural yang beragam suku, agama, dan adat istiadat, sumber utama konflik sosial seringkali berasal dari...",
+                options: [
+                    "Kesamaan tujuan hidup semua warganya.",
+                    "Tingginya toleransi antar kelompok.",
+                    "Perbedaan kepentingan, prasangka (stereotype), dan etnosentrisme.",
+                    "Distribusi kekayaan yang merata sempurna."
+                ],
+                correctAnswer: 2,
+                explanation: "Masyarakat multikultural rentan terhadap konflik jika tidak dikelola dengan baik. Sumber konflik bisa berupa perbedaan kepentingan ekonomi atau politik, prasangka negatif terhadap kelompok lain (stereotype), dan sikap etnosentrisme (menganggap budaya sendiri paling baik)."
+            },
+            {
+                question: "Upaya untuk menyatukan kembali masyarakat yang terpecah belah akibat konflik, dengan cara membangun kembali kepercayaan dan kerjasama, disebut...",
+                options: [
+                    "Asimilasi paksa",
+                    "Segregasi sosial",
+                    "Integrasi sosial",
+                    "Dominasi kelompok mayoritas"
+                ],
+                correctAnswer: 2,
+                explanation: "Integrasi sosial adalah proses penyatuan berbagai unsur yang berbeda dalam masyarakat (individu, kelompok, nilai, norma) sehingga menjadi satu kesatuan yang harmonis dan berfungsi. Ini adalah upaya penting pasca-konflik untuk memulihkan kohesi sosial."
+            },
+            {
+                question: "Salah satu faktor yang dapat memudahkan tercapainya integrasi sosial dalam masyarakat majemuk adalah...",
+                options: [
+                    "Adanya sikap saling curiga antar kelompok.",
+                    "Dominasi mutlak satu kelompok atas kelompok lain.",
+                    "Adanya konsensus bersama mengenai nilai-nilai dasar dan tujuan bersama, serta sikap toleransi.",
+                    "Perbedaan yang sangat tajam dalam hal status sosial ekonomi."
+                ],
+                correctAnswer: 2,
+                explanation: "Integrasi sosial lebih mudah tercapai jika ada kesepakatan (konsensus) di antara anggota masyarakat mengenai nilai-nilai fundamental dan tujuan bersama. Sikap toleransi, saling menghargai perbedaan, dan kesempatan yang sama dalam berbagai bidang juga merupakan faktor pendorong integrasi."
+            },
+            {
+                question: "Konflik yang terjadi antara dua partai politik yang memiliki pandangan dan program kerja yang sangat berbeda dalam memperebutkan pengaruh di masyarakat merupakan jenis konflik...",
+                options: [
+                    "Konflik pribadi",
+                    "Konflik rasial",
+                    "Konflik ideologi atau politik",
+                    "Konflik antar kelas sosial"
+                ],
+                correctAnswer: 2,
+                explanation: "Konflik ideologi terjadi karena adanya perbedaan gagasan, prinsip, atau keyakinan dasar mengenai bagaimana masyarakat seharusnya diatur atau tujuan apa yang harus dicapai. Konflik antar partai politik seringkali berakar pada perbedaan ideologi atau platform politik."
+            },
+            {
+                question: "Penyelesaian konflik di mana pihak ketiga yang netral membantu para pihak yang berkonflik untuk mencapai kesepakatan, namun tidak memiliki wewenang untuk membuat keputusan yang mengikat, disebut...",
+                options: [
+                    "Arbitrase",
+                    "Mediasi",
+                    "Ajudikasi",
+                    "Konsiliasi"
+                ],
+                correctAnswer: 1,
+                explanation: "Mediasi adalah proses penyelesaian sengketa melalui perundingan antara para pihak dengan bantuan seorang mediator (pihak ketiga netral). Mediator memfasilitasi komunikasi dan membantu mencari solusi, tetapi keputusan akhir tetap ada pada para pihak yang bersengketa."
+            },
+            {
+                question: "Perkembangan pesat teknologi informasi dan komunikasi, seperti internet dan media sosial, telah membawa perubahan sosial yang signifikan, salah satunya adalah...",
+                options: [
+                    "Menguatnya peran surat kabar cetak.",
+                    "Terbentuknya komunitas virtual dan percepatan penyebaran informasi.",
+                    "Penurunan minat masyarakat terhadap hiburan.",
+                    "Masyarakat menjadi semakin terisolasi dari dunia luar."
+                ],
+                correctAnswer: 1,
+                explanation: "Teknologi informasi dan komunikasi telah mengubah cara orang berinteraksi, bekerja, dan mendapatkan informasi. Munculnya komunitas virtual, kemudahan akses informasi global, dan percepatan arus komunikasi adalah beberapa dampak nyata dari perkembangan teknologi ini terhadap perubahan sosial."
+            }
+        ];
+
+        // --- Variabel Quiz ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswerIndex = null; // Untuk menyimpan jawaban yang dipilih sebelum konfirmasi
+
+        // --- Elemen DOM ---
+        const questionTextElement = document.getElementById('question-text');
+        const optionsContainerElement = document.getElementById('options-container');
+        const explanationAreaElement = document.getElementById('explanation-area');
+        const explanationTextElement = document.getElementById('explanation-text');
+        const nextButtonElement = document.getElementById('next-button');
+        const quizAreaElement = document.getElementById('quiz-area');
+        const resultsAreaElement = document.getElementById('results-area');
+        const finalScoreElement = document.getElementById('final-score');
+        const scoreMessageElement = document.getElementById('score-message');
+        const scoreImageElement = document.getElementById('score-image');
+        const restartButtonElement = document.getElementById('restart-button');
+        const questionCounterElement = document.getElementById('question-counter');
+        const scoreCounterElement = document.getElementById('score-counter');
+        const progressBarElement = document.getElementById('progress-bar');
+
+        // Modal elements
+        const confirmationModal = document.getElementById('confirmationModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalConfirmButton = document.getElementById('modalConfirmButton');
+        const modalCancelButton = document.getElementById('modalCancelButton');
+
+        // --- Fungsi-Fungsi Quiz ---
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        function loadQuestion() {
+            // Reset dari soal sebelumnya
+            explanationAreaElement.style.display = 'none';
+            nextButtonElement.style.display = 'none';
+            optionsContainerElement.innerHTML = ''; // Kosongkan opsi sebelumnya
+            selectedAnswerIndex = null;
+
+            if (currentQuestionIndex < questions.length) {
+                const currentQuestion = questions[currentQuestionIndex];
+                questionTextElement.textContent = currentQuestion.question;
+                questionCounterElement.textContent = `Soal ${currentQuestionIndex + 1} dari ${questions.length}`;
+                updateProgressBar();
+
+                currentQuestion.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('option-button');
+                    button.addEventListener('click', () => handleOptionClick(index, button));
+                    optionsContainerElement.appendChild(button);
+                });
+            } else {
+                showResults();
+            }
+        }
+
+        function handleOptionClick(index, buttonElement) {
+            // Jika sudah ada jawaban yang dipilih & dikonfirmasi, jangan lakukan apa-apa
+            if (nextButtonElement.style.display === 'block' && explanationAreaElement.style.display === 'block') {
+                return;
+            }
+            
+            selectedAnswerIndex = index; // Simpan index jawaban yang diklik
+            
+            // Tampilkan modal konfirmasi
+            modalTitle.textContent = "Konfirmasi Jawaban";
+            modalBody.textContent = `Anda memilih: "${questions[currentQuestionIndex].options[index]}". Apakah Anda yakin?`;
+            confirmationModal.style.display = 'flex';
+        }
+        
+        modalConfirmButton.addEventListener('click', () => {
+            confirmationModal.style.display = 'none';
+            if (selectedAnswerIndex !== null) {
+                processAnswer(selectedAnswerIndex);
+            }
+        });
+
+        modalCancelButton.addEventListener('click', () => {
+            confirmationModal.style.display = 'none';
+            selectedAnswerIndex = null; // Reset pilihan jika dibatalkan
+        });
+
+
+        function processAnswer(selectedIndex) {
+            const currentQuestion = questions[currentQuestionIndex];
+            const optionButtons = optionsContainerElement.getElementsByTagName('button');
+
+            // Disable semua tombol opsi setelah jawaban dipilih
+            for (let btn of optionButtons) {
+                btn.disabled = true;
+            }
+
+            if (selectedIndex === currentQuestion.correctAnswer) {
+                score++;
+                optionButtons[selectedIndex].classList.add('correct');
+                // Tidak perlu menampilkan modal benar di sini, cukup highlight
+            } else {
+                optionButtons[selectedIndex].classList.add('incorrect');
+                optionButtons[currentQuestion.correctAnswer].classList.add('correct'); // Tunjukkan jawaban yang benar
+                 // Tidak perlu menampilkan modal salah di sini, cukup highlight
+            }
+
+            scoreCounterElement.textContent = `Skor: ${score}`;
+            explanationTextElement.innerHTML = currentQuestion.explanation; // Gunakan innerHTML jika penjelasan mengandung HTML
+            explanationAreaElement.style.display = 'block';
+            nextButtonElement.style.display = 'block';
+        }
+
+
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex +1) / questions.length) * 100;
+            progressBarElement.style.width = `${progress}%`;
+        }
+
+        function showResults() {
+            quizAreaElement.style.display = 'none';
+            resultsAreaElement.style.display = 'block';
+            finalScoreElement.textContent = `Skor Akhir Anda: ${score} dari ${questions.length}`;
+            
+            let message = "";
+            let imageUrl = "";
+            const percentage = (score / questions.length) * 100;
+
+            if (percentage >= 80) {
+                message = "Luar biasa! Pemahaman sosiologimu sangat baik!";
+                imageUrl = "https://placehold.co/200x200/22c55e/ffffff?text=Hebat!";
+            } else if (percentage >= 60) {
+                message = "Bagus! Terus tingkatkan pemahamanmu.";
+                imageUrl = "https://placehold.co/200x200/3b82f6/ffffff?text=Bagus!";
+            } else if (percentage >= 40) {
+                message = "Cukup baik. Perlu belajar lebih giat lagi ya.";
+                imageUrl = "https://placehold.co/200x200/f97316/ffffff?text=Semangat!";
+            } else {
+                message = "Jangan menyerah! Coba lagi dan pelajari pembahasannya.";
+                imageUrl = "https://placehold.co/200x200/ef4444/ffffff?text=Coba+Lagi";
+            }
+            scoreMessageElement.textContent = message;
+            if (imageUrl) {
+                scoreImageElement.src = imageUrl;
+                scoreImageElement.style.display = 'block';
+            } else {
+                 scoreImageElement.style.display = 'none';
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedAnswerIndex = null;
+            scoreCounterElement.textContent = `Skor: 0`;
+            quizAreaElement.style.display = 'block';
+            resultsAreaElement.style.display = 'none';
+            shuffleArray(questions); // Acak urutan soal setiap kali restart
+            loadQuestion();
+        }
+
+        // --- Event Listeners ---
+        nextButtonElement.addEventListener('click', () => {
+            currentQuestionIndex++;
+            loadQuestion();
+        });
+
+        restartButtonElement.addEventListener('click', restartQuiz);
+
+        // --- Mulai Kuis ---
+        shuffleArray(questions); // Acak soal saat pertama kali dimuat
+        loadQuestion();
+
+    </script>
+</body>
+</html>
